@@ -53,21 +53,21 @@ public class ObjectSearchTestMain : MonoBehaviour
     {
         if (CharacterCandidateList != null)
         {
-            Debug.LogFormat("Result:{0}", CharacterCandidateList.Count);
             foreach (var character in CharacterCandidateList)
             {
-                sb.AppendLine(character.name);
+               //sb.AppendLine(character.name);
             }
-            Debug.Log(sb.ToString());
+            Debug.LogFormat("Result:{0}", CharacterCandidateList.Count);
+            //Debug.Log(sb.ToString());
         }
         if (CharacterCandidateEnum != null)
         {
-            Debug.LogFormat("Result:{0}", CharacterCandidateEnum.Count());
             foreach (var character in CharacterCandidateEnum)
             {
-                sb.AppendLine(character.name);
+                //sb.AppendLine(character.name);
             }
-            Debug.Log(sb.ToString());
+            Debug.LogFormat("Result:{0}", CharacterCandidateEnum.Count());
+            //Debug.Log(sb.ToString());
         }
     }
     /// <summary>
@@ -87,8 +87,21 @@ public class ObjectSearchTestMain : MonoBehaviour
 
         Result();
         Endprocess(out GCTotalMemory);
+        Debug.LogFormat("Linq To Enum Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
 
-        Debug.LogFormat("OnLinqSearch Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
+
+        Preprocess(out before);
+        for (int search = 0; search < SearchLoopNum; search++)
+        {
+            CharacterCandidateList = null;
+            CharacterCandidateList = (from x in CharacterList
+                                      where x.groupColor.Equals(Character.GroupColor.Red)
+                                      select x).ToList();
+        }
+
+        Result();
+        Endprocess(out GCTotalMemory);
+        Debug.LogFormat("Linq To List Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
     }
     /// <summary>
     /// for文を用いた要素の抽出
@@ -114,8 +127,7 @@ public class ObjectSearchTestMain : MonoBehaviour
 
         Result();
         Endprocess(out GCTotalMemory);
-
-        Debug.LogFormat("OnForLoopSearch Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
+        Debug.LogFormat("Forloop Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
     }
     /// <summary>
     /// foreach文を用いた要素の抽出
@@ -140,8 +152,7 @@ public class ObjectSearchTestMain : MonoBehaviour
 
         Result();
         Endprocess(out GCTotalMemory);
-
-        Debug.LogFormat("OnForeachSearch Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
+        Debug.LogFormat("Foreach Time:{0}msec GC:{1}byte", StopWatchUtility.instance.ElapsedMilliseconds, GCTotalMemory - before);
     }
 }
 
